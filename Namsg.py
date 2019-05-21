@@ -3,7 +3,7 @@
 @register
 class Namsg(Optimizer):
     """
-    The NAMSG optimizer by Yushu Chen
+    The NAMSG optimizer
     Parameters
     ----------
     beta1 : float, optional
@@ -13,7 +13,7 @@ class Namsg(Optimizer):
     epsilon : float, optional
         Small value to avoid dividing by 0.
     eta : float, optional
-        Oberservation factor
+        Oberservation distance
     """
     
     def __init__(self, learning_rate=0.002, beta1=0.9, beta2=0.99, epsilon=1e-8, eta=0.9, **kwargs):
