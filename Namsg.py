@@ -1,8 +1,24 @@
 #Add the class to optimizer.py in MXNET to use the NAMSG optimizer
-#Use set_obs_fac to set the observation factor mu
+
 #Recommended hyper-parameters: beta1=0.999, beta2=0.99, epsilon=1e-8,
-#mu=0.1 to maximize training speed, and mu=0.2 to improve generalization
+#Use mu=0.1 to maximize training speed, and mu=0.2 to improve generalization.
 #learning_rate is obtained through grid search.
+
+#The observation boost hyper-parameter (OBSB) policy
+#Perform grid search for a small proportion of epoches to obtain the initial step size alpha0,
+#with beta1=0.999, beta2=0.99, and mu=mu0=0.05. 
+#In training, start with step size alpha0 and observation factor mu0. 
+#Compute the average convergence rate at the interval of several epoches.
+#In experiments to optimize training speed, apply boost when the convergence rate is halved.
+#In experiments to optimize generalization, apply boost when the train loss flattens, 
+#or when the validation accuracy flattens if a validation set is available.
+#To apply boost, set mu=2*mu, and scale the step size according to the ratio of 
+#tau=alpha*lambda to minimize the gain factor. If mu0=0.05, alpha=alpha0*0.247.
+#OBSB is different from vanilla learning_rate decay, since a small mu enalbes large initial
+#step size. After applying the observation boost, the step size is still relatively large.
+#Consequently, we can still apply learning_rate decay to achieve acceleration.
+
+#Use set_obs_fac_mu to set the observation factor mu.
 
 @register
 class Namsg(Optimizer):
@@ -33,7 +49,7 @@ class Namsg(Optimizer):
                 self.epsilon * ones(weight.shape, weight.context, dtype=weight.dtype))  # vMax
     
     #set the observation factor 
-    def set_obs_fac(self,fMu): 
+    def set_obs_fac_mu(self,fMu): 
         self.fMu=fMu
 
     def update(self, index, weight, grad, state):
