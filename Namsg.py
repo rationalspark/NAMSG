@@ -84,4 +84,5 @@ class Namsg(Optimizer):
     #Optional
     #Call restart after changing hyper-parameters to make the preconditioner up to date
     def restart(self):
+        m_t, v_t, vMax_t = state
         vMax_t[:] = v_t
