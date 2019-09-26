@@ -48,8 +48,16 @@ class Namsg(Optimizer):
                 zeros(weight.shape, weight.context, dtype=weight.dtype),  # v
                 self.epsilon * ones(weight.shape, weight.context, dtype=weight.dtype))  # vMax
     
-    #set the observation factor 
+    #set the observation factor mu
     def set_obs_fac_mu(self,mu): 
+        self.mu=mu
+
+    #set the observation factor based on eta
+    def set_obs_fac(self,fEta): 
+        if self.beta1>self.epsilon:
+            mu=fEta*(1-self.beta1)/self.beta1
+        else:
+            mu=0
         self.mu=mu
 
     def update(self, index, weight, grad, state):
