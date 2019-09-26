@@ -1,5 +1,9 @@
 #Add the class to optimizer.py in MXNET to use the NAMSG optimizer
-#Use set_obs_fac to set the observation distance eta
+#Use set_obs_fac to set the observation factor mu
+#Recommended hyper-parameters: beta1=0.999, beta2=0.99, epsilon=1e-8,
+#mu=0.1 to maximize training speed, and mu=0.2 to improve generalization
+#learning_rate is obtained through grid search.
+
 @register
 class Namsg(Optimizer):
     """
@@ -12,25 +16,25 @@ class Namsg(Optimizer):
         Exponential decay rate for the second moment estimates.
     epsilon : float, optional
         Small value to avoid dividing by 0.
-    eta : float, optional
-        Oberservation distance
+    mu : float, optional
+        Oberservation factor
     """
     
-    def __init__(self, learning_rate=0.002, beta1=0.9, beta2=0.99, epsilon=1e-8, eta=0.9, **kwargs):
+    def __init__(self, learning_rate=0.002, beta1=0.999, beta2=0.99, epsilon=1e-8, mu=0.1, **kwargs):
         super(Namsg, self).__init__(learning_rate=learning_rate, **kwargs)
         self.beta1 = beta1
         self.beta2 = beta2
         self.epsilon = epsilon
-        self.fEta = eta
+        self.fMu = mu
 
     def create_state(self, index, weight):
         return (zeros(weight.shape, weight.context, dtype=weight.dtype),  # momentum
                 zeros(weight.shape, weight.context, dtype=weight.dtype),  # v
                 self.epsilon * ones(weight.shape, weight.context, dtype=weight.dtype))  # vMax
     
-    #set the observation distance eta    
-    def set_obs_fac(self,fEta): 
-        self.fEta=fEta
+    #set the observation factor 
+    def set_obs_fac(self,fMu): 
+        self.fMu=fMu
 
     def update(self, index, weight, grad, state):
         assert(isinstance(weight, NDArray))
@@ -56,81 +60,9 @@ class Namsg(Optimizer):
         vMax_t[:] = maximum(v_t, vMax_t)
         
         # Rectify momentum
-        fMu = self.fEta * (1.0/self.beta1 -1.0)
+        fMu = self.fMu
         m_rec = lr *(1.0 -fMu) *m_t + lr *fMu * grad
         
         weight[:] -= m_rec / sqrt(vMax_t)
         
-        
-@register
-class Namsb(Optimizer):
-    """
-    The NAMSB optimizer
-    Parameters
-    ----------
-    beta1 : float, optional
-        Exponential decay rate for the first moment estimates.
-    beta2 : float, optional
-        Exponential decay rate for the second moment estimates.
-    epsilon : float, optional
-        Small value to avoid dividing by 0.
-    eta : float, optional
-        Oberservation factor
-    final_lr : learning rate
-    gamma : convergence speed of the bound functions
-    """
-    
-    def __init__(self, learning_rate=0.002, beta1=0.9, beta2=0.99, epsilon=1e-8, eta=0.9, final_lr=0.1, gamma=0.001, **kwargs):
-        super(Namsb, self).__init__(learning_rate=learning_rate, **kwargs)
-        self.beta1 = beta1
-        self.beta2 = beta2
-        self.epsilon = epsilon
-        self.fEta = eta
-        self.final_lr = final_lr
-        self.gamma = gamma
-
-    def create_state(self, index, weight):
-        return (zeros(weight.shape, weight.context, dtype=weight.dtype),  # momentum
-                zeros(weight.shape, weight.context, dtype=weight.dtype),  # v
-                self.epsilon * ones(weight.shape, weight.context, dtype=weight.dtype))  # vMax
-                                
-    def set_obs_fac(self,fEta): 
-        self.fEta=fEta
-        
-    def set_final_lr(self,final_lr): 
-        self.final_lr = final_lr
-
-    def get_final_lr(self): 
-        return self.final_lr
-        
-    def update(self, index, weight, grad, state):
-        assert(isinstance(weight, NDArray))
-        assert(isinstance(grad, NDArray))
-        self._update_count(index)
-        lr = self._get_lr(index)
-        wd = self._get_wd(index)
-
-        t = self._index_update_count[index]
-
-        # Weight decay
-        grad = grad * self.rescale_grad
-        if wd !=0:
-            grad = grad + wd * weight
-
-        if self.clip_gradient is not None:
-            grad = clip(grad, -self.clip_gradient, self.clip_gradient)
-
-        lower_bnd = self.final_lr * (1.0 - 1.0 / (self.gamma * self.num_update + 1.0))
-        upper_bnd = self.final_lr * (1.0 + 1.0 / (self.gamma * self.num_update))
-
-        # update m, v, and vMax
-        m_t, v_t, vMax_t = state
-        m_t[:] = self.beta1 * m_t + (1. - self.beta1) * grad
-        v_t[:] = self.beta2 * v_t + (1. - self.beta2) * grad * grad
-        vMax_t[:] = maximum(v_t, vMax_t)
-        
-        # Rectify momentum
-        fMu = self.fEta * (1.0/self.beta1 -1.0)
-        m_rec = lr *(1.0 -fMu) *m_t + lr *fMu * grad
-        
-        weight[:] -= m_rec / clip(sqrt(vMax_t), lr/upper_bnd, lr/lower_bnd)
+       
