@@ -41,7 +41,7 @@ class Namsg(Optimizer):
         self.beta1 = beta1
         self.beta2 = beta2
         self.epsilon = epsilon
-        self.fMu = mu
+        self.mu = mu
 
     def create_state(self, index, weight):
         return (zeros(weight.shape, weight.context, dtype=weight.dtype),  # momentum
@@ -49,8 +49,8 @@ class Namsg(Optimizer):
                 self.epsilon * ones(weight.shape, weight.context, dtype=weight.dtype))  # vMax
     
     #set the observation factor 
-    def set_obs_fac_mu(self,fMu): 
-        self.fMu=fMu
+    def set_obs_fac_mu(self,mu): 
+        self.mu=mu
 
     def update(self, index, weight, grad, state):
         assert(isinstance(weight, NDArray))
@@ -76,8 +76,8 @@ class Namsg(Optimizer):
         vMax_t[:] = maximum(v_t, vMax_t)
         
         # Rectify momentum
-        fMu = self.fMu
-        m_rec = lr *(1.0 -fMu) *m_t + lr *fMu * grad
+        mu = self.mu
+        m_rec = lr *(1.0 -mu) *m_t + lr *mu * grad
         
         weight[:] -= m_rec / sqrt(vMax_t)
         
