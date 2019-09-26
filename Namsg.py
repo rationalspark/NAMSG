@@ -73,7 +73,11 @@ class Namsg(Optimizer):
         m_t, v_t, vMax_t = state
         m_t[:] = self.beta1 * m_t + (1. - self.beta1) * grad
         v_t[:] = self.beta2 * v_t + (1. - self.beta2) * grad * grad
-        vMax_t[:] = maximum(v_t, vMax_t)
+        if not self.restart:
+            vMax_t[:] = maximum(v_t, vMax_t)
+        else:
+            vMax_t[:] = v_t
+            self.restart = False
         
         # Rectify momentum
         mu = self.mu
@@ -84,5 +88,4 @@ class Namsg(Optimizer):
     #Optional
     #Call restart after changing hyper-parameters to make the preconditioner up to date
     def restart(self):
-        m_t, v_t, vMax_t = state
-        vMax_t[:] = v_t
+        self.restart = True
