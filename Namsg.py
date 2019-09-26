@@ -80,5 +80,8 @@ class Namsg(Optimizer):
         m_rec = lr *(1.0 -mu) *m_t + lr *mu * grad
         
         weight[:] -= m_rec / sqrt(vMax_t)
-        
-       
+     
+    #Optional
+    #Call restart after changing hyper-parameters to make the preconditioner up to date
+    def restart(self):
+        vMax_t[:] = v_t
