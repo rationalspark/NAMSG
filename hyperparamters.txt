@@ -10,3 +10,7 @@ NAMSG   0.05,0.999,0.99,0.1         0.01,0.999,0.99,0.1     0.002, 0.999, 0.99,0
 CNAG    5.0,0.999,0.1               5.0,0.999,0.1           0.2, 0.999, 0.1             0.5, 0.99, 0.3
 OBSB    0.1,0.999,0.99,0.05	    0.05,0.999,0.99,0.05    0.005,0.999,0.99,0.05       0.01,0.999,0.99,0.05
 
+For NAMSG and OBSB, only the step size is obtained by grid search. The other parameters are set to the default values, as: beta1=0.999, beta2=0.99, mu=0.1 to achieve fast training speed, and mu=0.2 to improve generalization at the cost of more iterations. 
+The hyper-parameters for other methods are obtained by grid search.
+
+In OBSB, the average convergence rate is compute each 2 epoches and 10 epoches for experiments on MNIST and CIFAR10, respectively. In the experiments to optimize training speed, mu is set to 0.1 when the convergence rate is halved, and the step size is scaled by 0.247 according to the ratio of tau to minimize the gain factor for different observation factors. 
