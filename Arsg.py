@@ -4,19 +4,22 @@
 #Use mu=0.1 to maximize training speed, and mu=0.2 to improve generalization.
 #learning_rate is obtained through grid search.
 
+
 #The observation boost hyper-parameter (OBSB) policy
-#Perform grid search for a small proportion of epoches to obtain the initial step size alpha0,
-#with beta1=0.999, beta2=0.99, and mu=mu0=0.05. 
+#Perform grid search for a small proportion of epoches to obtain the initial step size alpha0,with a beta1
+#close to 1, and a relatively small mu. 
 #In training, start with step size alpha0 and observation factor mu0. 
 #Compute the average convergence rate at the interval of several epoches.
 #In experiments to optimize training speed, apply boost when the convergence rate is halved.
 #In experiments to optimize generalization, apply boost when the train loss flattens, 
 #or when the validation accuracy flattens if a validation set is available.
 #To apply boost, set mu=2*mu, and scale the step size according to the ratio of 
-#tau=alpha*lambda to minimize the gain factor. If mu0=0.05, alpha=alpha0*0.247.
+#tau=alpha*lambda to minimize the gain factor. 
 #OBSB is different from vanilla learning_rate decay, since a small mu enalbes large initial
 #step size. After applying the observation boost, the step size is still relatively large.
 #Consequently, we can still apply learning_rate decay to achieve acceleration.
+
+#The recommend hyper-parameters for OBSB are  beta1=0.999, beta2=0.99, and mu=mu0=0.05. alpha should be roughly divided by 4 when $\mu$ is doubled.
 
 #Use set_obs_fac_mu to set the observation factor mu.
 
