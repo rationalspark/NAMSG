@@ -2,4 +2,8 @@ ARSG is an efficient method for training neural networks. The acronym is derived
 
 The paper is available at https://arxiv.org/abs/1905.01422. 
 
+We present a convergence proof for non-convex problems (in Nonconvex.pdf), which is more applicable for training deep neural
+works. The results show that generalized ARSG shares the form of the convergence bound of the generalized ADAM methods, and
+improves the coefficients. Particularly, ARSG with the preconditioner of AMSGRAD also shares the $O(log(T)/\sqrt{T}$ convergence rate of AMSGRAD, whilst the coefficients are improved.
+
 NAMSG is a former name of ARSG.
