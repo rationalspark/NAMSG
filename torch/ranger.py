@@ -1,5 +1,6 @@
 #Ranger deep learning optimizer - RAdam + Lookahead combined.
 #https://github.com/lessw2020/Ranger-Deep-Learning-Optimizer
+#The weight decay is modified to make it consistent with the PyTorch offical implementation of ADAM
 
 #Ranger has now been used to capture 12 records on the FastAI leaderboard.
 
