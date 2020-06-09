@@ -3,3 +3,5 @@ ARSG is an efficient method for training neural networks. The acronym is derived
 The paper is available at https://arxiv.org/abs/1905.01422. 
 
 NAMSG is a former name of ARSG.
+
+The file "supplementary materials.pdf" may not be downloaded or previewed since the platform is instable. It can be obtained by downloading or cloning the repository.
